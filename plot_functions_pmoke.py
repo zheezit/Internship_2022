@@ -7,11 +7,13 @@ import os
 import sys
 import glob
 from matplotlib.colors import LinearSegmentedColormap
+plt.rcParams.update({'font.size': 15})
 
 save_plots = True
-colors = plt.cm.Set3(np.linspace(0.2, 1.1, 12)) #color map, Set3 = hvilken colormap du bruger, der er også Reds
+colors = plt.cm.Set3(np.linspace(0.3, 1.1, 8)) #color map, Set3 = hvilken colormap du bruger, der er også Reds
+# colors = plt.cm.Set3(np.linspace(0.2, 0.3, 8)) #color map, Set3 = hvilken colormap du bruger, der er også Reds
 # field_mT = 33.8+166.2 * field_I-0.603* field_I* field_I-0.96 *field_I* field_I* field_I
-# colors = plt.cm.RdGy(np.linspace(0.2, 1.1, 7))
+# colors = plt.cm.RdGy(np.linspace(0.0, 1.07, 28))
 DeltaH = 250
 
 #This code loads the data and finds the standard deviation and the mean of sampels
@@ -66,26 +68,29 @@ def plotfunction(serie, list): #this function takes in a matrix and let you plot
     #note that len(criterias) = len(data) + in same order
     data, criterias, std = std_pmoke(serie, list) # this part finds the std and the mean of the measurements
     # --------------------------------------------------------------------------------------------------------------------------------------------
-    fig, ax = plt.subplots(1,figsize=(12,6), sharex=True) 
-    fig.suptitle(f'Hysterisis of Magnetization as a function of magnetic field {serie}', fontsize=16)
+    fig, ax = plt.subplots(1,figsize=(20,6), sharex=True) 
+    # fig.suptitle(f'Hysterisis of Magnetization as a function of magnetic field {serie}', fontsize=16)
     ax.axhline(0, linestyle = "--" , c="k") # horizontal line at energy = 1 
     ax.axhline(0, linestyle = "--" , c="k") # horizontal line at energy = 1 
     ax.axvline(0, linestyle = "--" , c="k")
     ax.set_ylabel('Intensity')
     ax.set_xlabel('Magnetic field(Gauss)')
-    ax.set_title("pmoke")
-
+    ax.set_title("PMOKE - Changing composition")
+    # s = [20]
     for i in range(len(data)):
         field_pmoke = data[i][0][0] + DeltaH
         scaled_pmoke = scale_l(data[i][0][1])
         ax.plot(
             field_pmoke,scaled_pmoke,'.',
             color = colors[i],
-            label = f"{criterias[i]}",)
+            label = f"{criterias[i]}",markersize=14)
 
-        ax.errorbar(field_pmoke, scaled_pmoke ,yerr=std[i],fmt='--.', 
+        ax.errorbar(field_pmoke, scaled_pmoke ,yerr=std[i],fmt='--.', markersize=14,
             color = colors[i],)
-    ax.legend(frameon=False, loc='center left', bbox_to_anchor=(1, 0.5))
+    # ax.set_xlim(-8000, 8000)
+    # ax.set_ylim(-1.2,1.2)
+    # ax.legend(frameon=False, loc='center left', bbox_to_anchor=(1, 0.5))
+    ax.legend(loc='upper left')
     if save_plots:
         fig.savefig(f'moke\{serie[0]}\{serie[0]}.png', bbox_inches = "tight" ,dpi=300)
     fig.tight_layout()
@@ -93,10 +98,44 @@ def plotfunction(serie, list): #this function takes in a matrix and let you plot
 
 #--------------------------------------------------------Comparing DATA - ---------------------------------------------------
 
-# # Comparing different parts of sampel 
-# serie = ["comparing MOKE measurements on different parts of sampel 20220426_APRD1"]
-# list = [["75nm_A","75nm_E", "75nm_E2", "75nm_E3","75nm_R"]]
+# # comparing moke measurements of cleaning
+serie = ["MOKE_cleaning"]
+list = [["1.1 - Acetone","1.2 - Ethanol"]]
+plotfunction(serie,list)
+
+
+# # Comparing different parts of sample
+# serie = ["MOKE_different_spots sample 2.1 and 2.2"]
+# list = [["2.1Pt_A","2.1Pt_E","2.1Pt_E2","2.1Pt_E3","2.2Ta_A","2.2Ta_E","2.2Ta_E2","2.2Ta_E3"]]
 # plotfunction(serie,list)
+
+# # # comparing different thickness
+# serie = ["MOKE_changing thickness_p(Ar)0.41microbar"]
+# list = [["3.1 - 20nm","3.1 - 20nm","3.2 - 50nm","3.3 - 75nm","3.4 - 100nm","3.5 - 150nm","3.6 - 200nm"]]
+# plotfunction(serie,list)
+
+# # # comparing different compositions 
+# serie = ["MOKE_changing composition"]
+# list = [["4.1 - X=0.12","4.2 - X=0.15","4.3 - X=0.10"]]
+# plotfunction(serie,list)
+
+# # # comparing different thickness 0.2 microbar
+# serie = ["MOKE_changing thickness_p(Ar)0.2microbar"]
+# list = [["5.1 - 20nm","5.1 - 20nm","5.2 - 50nm","5.3 - 75nm","5.4 - 100nm","5.5 - 150nm","5.6 - 200nm"]]
+# plotfunction(serie,list)
+
+
+
+# # # Comparing different deposition rates
+# serie = ["MOKE_different deposition rates"]
+# list = [["1.2 - 2.1Ås^-1","2.2 - 2.2Ås^-1","3.3 - 1Ås^-1" ]]
+# plotfunction(serie,list)
+
+# # # comparing apej5 and apej6 
+# serie = ["MOKE_apej5 and apej6"]
+# list = [["5.5 - 150nm", "5.6 - 200nm"]]
+# plotfunction(serie,list)
+
 
 # # # comparing 75 nm 
 # serie = ["comparing MOKE measurements on different parts of sampel 20220426_APRD1","ap_Ta3(Co90Tb10)XPt3_P(Co)60W_p(Ar)0.2microbar","ap_Ta3(Co1-XTbX)75nmPt3_P(Co)60W_p(Ar)0,22microbar" ]
@@ -109,14 +148,31 @@ def plotfunction(serie, list): #this function takes in a matrix and let you plot
 # list = [["150nm-20220426_APRD3"],["150nm-20220531_APEJ5"],["Ta_150nm-20220518_APEJ8"]]
 # plotfunction(serie,list)
 
+# serie = ["comparing MOKE measurements on differents parts of sample 20220518_APEJ6"]
+# list = [["75nm_A", "75nm_E", "75nm_E2", "75nm_E3"]]
+# # list  = [["75nm_A", "75nm_E"]]
+# plotfunction(serie,list)
+
+
+# serie = ["comparing MOKE measurements on different parts of sample 20220518_APEJ1"]
+# list = [["75nm_A", "75nm_E", "75nm_E2", "75nm_E3"]]
+# # list  = [["75nm_A", "75nm_E"]]
+# plotfunction(serie,list)
+
+
+
 # ----------------------------------------------------- DATA -----------------------------------
 
+
+ # # ap_Ta3(Co90Tb10)XPt3_P(Co)60W_p(Ar)0.2microbar changing the thickness. 
+# serie = ["ap_Ta3(Co90Tb10)XPt3_P(Co)60W_p(Ar)0.2microbar"]
+# list = [["150nm-20220531_APEJ5","200nm-20220531_APEJ6",]]
+# plotfunction(serie,list)
 
 # # # ap_Ta3(Co90Tb10)XPt3_P(Co)60W_p(Ar)0.2microbar changing the thickness. 
 # serie = ["ap_Ta3(Co90Tb10)XPt3_P(Co)60W_p(Ar)0.2microbar"]
 # list = [["20nm-20220531_APEJ1", "50nm-20220531_APEJ2", "75nm-20220531_APEJ3", "100nm-20220531_APEJ4","150nm-20220531_APEJ5","200nm-20220531_APEJ6",]]
 # plotfunction(serie,list)
-
 
 
 # # Pt3/(co88tb12)_X/Pt3 changing the thickness made by APRD pressure of argon MKS= 1.5 microbar
@@ -173,12 +229,15 @@ def plotfunction(serie, list): #this function takes in a matrix and let you plot
 
 ##only pmoke
 
-# ap_Ta3(Co1-XTbX)75nmPt3_P(Co)60W_p(Ar)0,22microbar changing the composition
+# # ap_Ta3(Co1-XTbX)75nmPt3_P(Co)60W_p(Ar)0,22microbar changing the composition
 # serie = ["ap_Ta3(Co1-XTbX)75nmPt3_P(Co)60W_p(Ar)0,22microbar"]
 # list = [["X=10-20220525_APEJ3", "X=12-20220525_APEJ1", "X=12-20220525_APEJ1-Ethanol", "X=15-20220525_APEJ2"]]
 # plotfunction(serie,list)
 # list = [["X=12-20220525_APEJ1", "X=12-20220525_APEJ1-Ethanol"]]
 # plotfunction(serie,list)
+# list = [["X=15-20220525_APEJ2", "X=15-20220525_APEJ2,2", "X=15-20220525_APEJ2,3","X=15-20220525_APEJ2,6","X=15-20220525_APEJ2,7"]]
+# plotfunction(serie,list)
+
 
 # # Pt3/(co88tb12)_X/Pt3 changing the thickness made by AP pressure of argon MKS= 1.5 microbar Done it again with Marcel- ONLY PMOKE
 # serie =[ "ap_Pt3(Co88Tb12)XPt3_P(Co)90W_p(Ar)1,5microbar_2"]
@@ -223,17 +282,6 @@ def plotfunction(serie, list): #this function takes in a matrix and let you plot
 # list = [["20nm-20220523_APEJ1","50nm-20220523_APEJ2","75nm-20220523_APEJ3","100nm-20220523_APEJ4","150nm-20220523_APEJ5","200nm-20220523_APEJ6"]] 
 # plotfunction(serie,list)
 
-
-# serie = ["comparing MOKE measurements on differents parts of sample 20220518_APEJ6"]
-# list = [["75nm_A", "75nm_E", "75nm_E2", "75nm_E3"]]
-# # list  = [["75nm_A", "75nm_E"]]
-# plotfunction(serie,list)
-
-
-# serie = ["comparing MOKE measuremtns on different parts of sample 20220518_APEJ1"]
-# list = [["75nm_A", "75nm_E", "75nm_E2", "75nm_E3"]]
-# # list  = [["75nm_A", "75nm_E"]]
-# plotfunction(serie,list)
 
 
 

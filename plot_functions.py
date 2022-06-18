@@ -97,7 +97,8 @@ def plotfunction(serie, list): #this function takes in a matrix and let you plot
             label = f"{criterias[i]}",
             color = colors[i],)
     # ax[0].legend(frameon=False, loc='center left', bbox_to_anchor=(1, 0.5))
-    ax[1].legend(frameon = False, loc='center left', bbox_to_anchor=(1, 0.5))
+    ax[1].legend()
+    # ax[1].legend(frameon = False, loc='center left', bbox_to_anchor=(1, 0.5))
     # print(f"serie = {serie[0]}")
     # print(f"list = {list}")
     if save_plots:
